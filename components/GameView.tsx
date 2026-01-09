@@ -326,15 +326,15 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
 
   return (
     <div className="flex flex-col h-screen bg-[#f5f5f5]" ref={containerRef}>
-      <div className="bg-white shadow-sm px-6 py-3 flex items-center justify-between z-10">
-        <div className="flex items-center gap-4">
+      <div className="bg-white shadow-sm px-4 py-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between z-10">
+        <div className="flex items-center gap-3">
           <button onClick={() => { playSound('click'); onBack(); }} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
-          <span className="font-bold text-xl text-gray-700">Level {levelId}</span>
+          <span className="font-bold text-lg md:text-xl text-gray-700">Level {levelId}</span>
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto max-w-md p-1 bg-gray-50 rounded-xl">
+        <div className="flex items-center gap-2 overflow-x-auto max-w-full md:max-w-md p-1 bg-gray-50 rounded-xl">
           {PENS.map(pen => {
             const isUnlocked = unlockedPens.includes(pen.id) || pen.unlockedAt <= levelId;
             return (
@@ -342,33 +342,33 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
                 key={pen.id}
                 disabled={!isUnlocked}
                 onClick={() => { playSound('click'); setCurrentPen(pen); }}
-                className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-                  currentPen.id === pen.id ? 'bg-white shadow-md scale-110 border-2 border-blue-400' : 'hover:bg-gray-200'
+                className={`flex-shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center transition-all ${
+                  currentPen.id === pen.id ? 'bg-white shadow-md md:scale-110 border-2 border-blue-400' : 'hover:bg-gray-200'
                 } ${!isUnlocked && 'opacity-20 grayscale'}`}
               >
-                <span className="text-lg">{isUnlocked ? pen.icon : '🔒'}</span>
+                <span className="text-base md:text-lg">{isUnlocked ? pen.icon : '🔒'}</span>
               </button>
             );
           })}
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex items-center gap-2 justify-between md:justify-end">
           <button 
             onClick={toggleMute}
-            className={`p-3 rounded-full transition-all active:scale-90 ${isMuted ? 'bg-red-100 text-red-500' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+            className={`p-2.5 md:p-3 rounded-full transition-all active:scale-90 ${isMuted ? 'bg-red-100 text-red-500' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
           >
             {isMuted ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
             ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
             )}
           </button>
           <button 
             onClick={reset}
-            className="p-3 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all active:scale-90 flex items-center gap-2 px-5"
+            className="p-2.5 md:p-3 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all active:scale-90 flex items-center gap-2 px-4 md:px-5"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-            <span className="font-bold text-sm">Reset</span>
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            <span className="font-bold text-xs md:text-sm">Reset</span>
           </button>
         </div>
       </div>
@@ -399,13 +399,13 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
         )}
 
         {won && (
-          <div className="absolute inset-0 bg-white/40 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in z-20">
-            <div className="bg-white p-10 rounded-3xl shadow-2xl text-center scale-up">
-              <h2 className="text-5xl font-black text-gray-800 mb-4">MATCHED!</h2>
-              <p className="text-gray-500 mb-8">Excellent drawing skills!</p>
-              <div className="flex gap-4 justify-center">
-                <button onClick={reset} className="px-6 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200">Retry</button>
-                <button onClick={() => { playSound('click'); onComplete(); onBack(); }} className="px-8 py-3 bg-blue-500 text-white font-bold rounded-xl shadow-lg hover:bg-blue-600">Next Level</button>
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-sm flex flex-col items-center justify-center animate-fade-in z-20 p-4">
+            <div className="bg-white p-6 md:p-10 rounded-3xl shadow-2xl text-center scale-up max-w-sm w-full">
+              <h2 className="text-3xl md:text-5xl font-black text-gray-800 mb-3">MATCHED!</h2>
+              <p className="text-gray-500 mb-6 text-sm md:text-base">Excellent drawing skills!</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onClick={reset} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200">Retry</button>
+                <button onClick={() => { playSound('click'); onComplete(); onBack(); }} className="px-6 py-2.5 bg-blue-500 text-white font-bold rounded-xl shadow-lg hover:bg-blue-600">Next Level</button>
               </div>
             </div>
           </div>
