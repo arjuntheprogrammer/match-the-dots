@@ -13,7 +13,7 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
   const progressPercent = Math.round((progress / totalLevels) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-10 text-white">
+    <div className="h-screen overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-10 text-white">
       <div className="max-w-5xl mx-auto">
         <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-10">
           <div className="space-y-4">
@@ -59,11 +59,10 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
             </div>
           </div>
 
-          <div className="max-h-[52vh] overflow-y-auto pr-2">
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-              {LEVELS.map((lvl) => {
-                const isUnlocked = lvl.id <= unlockedLevels;
-                const isCompleted = lvl.id < unlockedLevels;
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+            {LEVELS.map((lvl) => {
+              const isUnlocked = lvl.id <= unlockedLevels;
+              const isCompleted = lvl.id < unlockedLevels;
                 return (
                   <button
                     key={lvl.id}
@@ -91,7 +90,6 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
                   </button>
                 );
               })}
-            </div>
           </div>
         </section>
       </div>
