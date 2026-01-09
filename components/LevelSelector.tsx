@@ -63,6 +63,7 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
               {LEVELS.map((lvl) => {
                 const isUnlocked = lvl.id <= unlockedLevels;
+                const isCompleted = lvl.id < unlockedLevels;
                 return (
                   <button
                     key={lvl.id}
@@ -75,16 +76,21 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
                     }`}
                   >
                     {isUnlocked ? (
-                      lvl.id
+                      <span className="flex flex-col items-center gap-1">
+                        <span className="text-base font-semibold">{lvl.id}</span>
+                        {isCompleted && (
+                          <span className="text-emerald-400 text-[11px]">✓</span>
+                        )}
+                      </span>
                     ) : (
                       <span className="flex flex-col items-center gap-1 text-[11px]">
                         <span className="text-sm font-semibold text-slate-400">{lvl.id}</span>
                         <span aria-hidden="true">🔒</span>
                       </span>
                     )}
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </section>
