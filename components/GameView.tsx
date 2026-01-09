@@ -176,17 +176,16 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     };
   }, [initPhysics]);
 
-  const togglePlay = () => {
-    playSound('click');
+  const startPhysics = () => {
+    if (isPlaying) return;
+    setIsPlaying(true);
     const M = (window as any).Matter;
     if (!engineRef.current || !M) return;
-    const nextState = !isPlaying;
-    setIsPlaying(nextState);
 
     const bodies = M.Composite.allBodies(engineRef.current.world);
     bodies.forEach((b: any) => {
       if (b.label === 'ball' || b.label === 'drawnShape') {
-        M.Body.setStatic(b, !nextState);
+        M.Body.setStatic(b, false);
       }
     });
   };
@@ -228,13 +227,13 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   };
 
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
-    if (isPlaying || won) return;
+    if (won) return;
     const pos = getPos(e);
     setDrawPoints([pos]);
   };
 
   const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (isPlaying || won || drawPoints.length === 0) return;
+    if (won || drawPoints.length === 0) return;
     const pos = getPos(e);
     const lastPos = drawPoints[drawPoints.length - 1];
     const dist = Math.sqrt(Math.pow(pos.x - lastPos.x, 2) + Math.pow(pos.y - lastPos.y, 2));
@@ -247,6 +246,10 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   const handleMouseUp = () => {
     if (drawPoints.length > 1) {
       createPhysicalLine(drawPoints);
+      // Auto-start physics on the first successful drawing
+      if (!isPlaying) {
+        startPhysics();
+      }
     }
     setDrawPoints([]);
   };
@@ -256,7 +259,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     if (!engineRef.current || !M) return;
 
     const segments = [];
-    const thickness = Math.max(currentPen.width, 6); // Ensure a minimum physical thickness
+    const thickness = Math.max(currentPen.width, 6);
 
     for (let i = 0; i < points.length - 1; i++) {
       const p1 = points[i];
@@ -269,7 +272,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
       const segment = M.Bodies.rectangle(
         p1.x + dx / 2,
         p1.y + dy / 2,
-        length + 2, // Slight overlap to prevent gaps
+        length + 2,
         thickness,
         {
           angle: angle,
@@ -285,7 +288,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
 
     const compound = M.Body.create({
       parts: segments,
-      isStatic: !isPlaying,
+      isStatic: !isPlaying, // If physics already started, new lines are immediately dynamic
       label: 'drawnShape',
       friction: 0.5
     });
@@ -362,18 +365,10 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
           </button>
           <button 
             onClick={reset}
-            className="p-3 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all active:scale-90"
+            className="p-3 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all active:scale-90 flex items-center gap-2 px-5"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-          </button>
-          <button 
-            onClick={togglePlay}
-            disabled={won}
-            className={`px-6 py-2 rounded-full font-bold text-white transition-all shadow-lg active:scale-95 flex items-center gap-2 ${
-              isPlaying ? 'bg-orange-500 hover:bg-orange-600' : 'bg-green-500 hover:bg-green-600'
-            } ${won && 'opacity-50 cursor-not-allowed'}`}
-          >
-            {isPlaying ? "Stop" : "Play"}
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            <span className="font-bold text-sm">Reset</span>
           </button>
         </div>
       </div>
@@ -390,9 +385,16 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
           className="bg-white shadow-2xl rounded-sm border-8 border-gray-100 max-w-full max-h-full object-contain"
         />
 
-        {level.hint && !isPlaying && !won && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full text-sm text-gray-500 border border-gray-100 shadow-sm pointer-events-none">
-            💡 {level.hint}
+        {!isPlaying && !won && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none">
+            <div className="bg-blue-600 text-white px-6 py-2 rounded-full font-bold shadow-xl animate-bounce">
+              Draw to start!
+            </div>
+            {level.hint && (
+              <div className="bg-white/90 backdrop-blur-sm px-4 py-1 rounded-full text-sm text-gray-500 border border-gray-100 shadow-sm">
+                💡 {level.hint}
+              </div>
+            )}
           </div>
         )}
 
@@ -411,7 +413,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
       </div>
 
       <div className="bg-white border-t p-3 flex justify-center text-xs text-gray-400 font-medium">
-        Shapes: {drawnShapesCount} • Matter.js Engine • Match the Dots
+        Shapes: {drawnShapesCount} • Matter.js Engine • Real-time Physics
       </div>
 
       <style>{`
