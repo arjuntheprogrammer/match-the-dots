@@ -217,15 +217,24 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
       clientX = actualEvent.clientX;
       clientY = actualEvent.clientY;
     }
-    
-    const scaleX = canvas.width / canvas.clientWidth;
-    const scaleY = canvas.height / canvas.clientHeight;
-    const offsetX = rect.left + canvas.clientLeft;
-    const offsetY = rect.top + canvas.clientTop;
+
+    const style = window.getComputedStyle(canvas);
+    const borderLeft = parseFloat(style.borderLeftWidth) || 0;
+    const borderRight = parseFloat(style.borderRightWidth) || 0;
+    const borderTop = parseFloat(style.borderTopWidth) || 0;
+    const borderBottom = parseFloat(style.borderBottomWidth) || 0;
+
+    const innerWidth = rect.width - borderLeft - borderRight;
+    const innerHeight = rect.height - borderTop - borderBottom;
+    const safeWidth = innerWidth > 0 ? innerWidth : rect.width;
+    const safeHeight = innerHeight > 0 ? innerHeight : rect.height;
+
+    const scaleX = GAME_WIDTH / safeWidth;
+    const scaleY = GAME_HEIGHT / safeHeight;
 
     return {
-      x: (clientX - offsetX) * scaleX,
-      y: (clientY - offsetY) * scaleY
+      x: (clientX - rect.left - borderLeft) * scaleX,
+      y: (clientY - rect.top - borderTop) * scaleY
     };
   };
 
