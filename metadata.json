@@ -1,0 +1,5 @@
+{
+  "name": "Match the Dots",
+  "description": "A physics-based drawing puzzle game where you guide two balls to collide by drawing lines and shapes.",
+  "requestFramePermissions": []
+}
