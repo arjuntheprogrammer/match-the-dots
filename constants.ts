@@ -75,5 +75,210 @@ export const LEVELS: Level[] = [
       { x: 600, y: 350, w: 100, h: 20, angle: 0.5 }
     ],
     hint: "Timing is everything."
+  },
+  {
+    id: 6,
+    balls: [
+      { x: 150, y: 120, color: '#3498db' },
+      { x: 650, y: 120, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 250, y: 360, w: 220, h: 20, angle: 0.3 },
+      { x: 550, y: 360, w: 220, h: 20, angle: -0.3 },
+      { x: 400, y: 460, w: 120, h: 20 }
+    ],
+    hint: "Let the ramps guide them inward."
+  },
+  {
+    id: 7,
+    balls: [
+      { x: 120, y: 460, color: '#3498db' },
+      { x: 680, y: 160, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 400, y: 300, w: 40, h: 400 },
+      { x: 180, y: 260, w: 160, h: 20 },
+      { x: 620, y: 260, w: 160, h: 20 }
+    ],
+    hint: "Bridge the center wall."
+  },
+  {
+    id: 8,
+    balls: [
+      { x: 120, y: 120, color: '#3498db' },
+      { x: 680, y: 480, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 260, y: 420, w: 180, h: 20 },
+      { x: 540, y: 300, w: 180, h: 20, angle: -0.2 },
+      { x: 400, y: 220, w: 140, h: 20, angle: 0.2 }
+    ],
+    hint: "Think in steps."
+  },
+  {
+    id: 9,
+    balls: [
+      { x: 200, y: 520, color: '#3498db' },
+      { x: 600, y: 520, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 400, y: 120, w: 800, h: 20 },
+      { x: 400, y: 360, w: 60, h: 320 }
+    ],
+    hint: "Use the ceiling as a guide."
+  },
+  {
+    id: 10,
+    balls: [
+      { x: 180, y: 220, color: '#3498db' },
+      { x: 620, y: 220, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 400, y: 400, w: 200, h: 20 },
+      { x: 260, y: 300, w: 140, h: 20, angle: 0.4 },
+      { x: 540, y: 300, w: 140, h: 20, angle: -0.4 }
+    ],
+    hint: "A gentle funnel works."
+  },
+  {
+    id: 11,
+    balls: [
+      { x: 120, y: 500, color: '#3498db' },
+      { x: 680, y: 100, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 150, y: 300, w: 200, h: 20, angle: 0.2 },
+      { x: 650, y: 320, w: 200, h: 20, angle: -0.2 },
+      { x: 400, y: 250, w: 60, h: 140 }
+    ],
+    hint: "Stagger the ramps."
+  },
+  {
+    id: 12,
+    balls: [
+      { x: 400, y: 120, color: '#3498db' },
+      { x: 400, y: 520, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 220, y: 320, w: 140, h: 20 },
+      { x: 580, y: 320, w: 140, h: 20 },
+      { x: 400, y: 320, w: 60, h: 200 }
+    ],
+    hint: "Break the vertical drop."
+  },
+  {
+    id: 13,
+    balls: [
+      { x: 150, y: 160, color: '#3498db' },
+      { x: 650, y: 440, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 300, y: 260, w: 200, h: 20, angle: 0.2 },
+      { x: 500, y: 380, w: 200, h: 20, angle: -0.2 },
+      { x: 400, y: 300, w: 80, h: 160 }
+    ],
+    hint: "Use staggered platforms."
+  },
+  {
+    id: 14,
+    balls: [
+      { x: 200, y: 480, color: '#3498db' },
+      { x: 600, y: 160, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 400, y: 260, w: 220, h: 20 },
+      { x: 250, y: 420, w: 140, h: 20, angle: -0.3 },
+      { x: 550, y: 420, w: 140, h: 20, angle: 0.3 }
+    ],
+    hint: "Balance both sides."
+  },
+  {
+    id: 15,
+    balls: [
+      { x: 100, y: 260, color: '#3498db' },
+      { x: 700, y: 260, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 400, y: 320, w: 300, h: 20 },
+      { x: 400, y: 180, w: 300, h: 20 }
+    ],
+    hint: "A simple tunnel works."
+  },
+  {
+    id: 16,
+    balls: [
+      { x: 180, y: 120, color: '#3498db' },
+      { x: 620, y: 520, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 240, y: 380, w: 180, h: 20, angle: 0.4 },
+      { x: 560, y: 260, w: 180, h: 20, angle: -0.4 }
+    ],
+    hint: "Cross the paths."
+  },
+  {
+    id: 17,
+    balls: [
+      { x: 400, y: 140, color: '#3498db' },
+      { x: 400, y: 460, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 200, y: 300, w: 160, h: 20, angle: 0.2 },
+      { x: 600, y: 300, w: 160, h: 20, angle: -0.2 }
+    ],
+    hint: "Angle the landing pads."
+  },
+  {
+    id: 18,
+    balls: [
+      { x: 160, y: 520, color: '#3498db' },
+      { x: 640, y: 120, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 400, y: 420, w: 260, h: 20 },
+      { x: 400, y: 240, w: 120, h: 20, angle: 0.4 }
+    ],
+    hint: "Build a mid-air catch."
+  },
+  {
+    id: 19,
+    balls: [
+      { x: 120, y: 180, color: '#3498db' },
+      { x: 680, y: 180, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 400, y: 320, w: 120, h: 240 },
+      { x: 260, y: 420, w: 140, h: 20 },
+      { x: 540, y: 420, w: 140, h: 20 }
+    ],
+    hint: "Split, then reconnect."
+  },
+  {
+    id: 20,
+    balls: [
+      { x: 200, y: 140, color: '#3498db' },
+      { x: 600, y: 140, color: '#e74c3c' }
+    ],
+    obstacles: [
+      { x: 400, y: 580, w: 800, h: 40 },
+      { x: 400, y: 340, w: 220, h: 20, angle: 0.15 },
+      { x: 400, y: 260, w: 220, h: 20, angle: -0.15 },
+      { x: 400, y: 460, w: 120, h: 20 }
+    ],
+    hint: "Finish with a gentle pinch."
   }
 ];
