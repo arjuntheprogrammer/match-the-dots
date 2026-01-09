@@ -2,19 +2,52 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# Match the Dots
 
-This contains everything you need to run your app locally.
+Match the Dots is a physics-based drawing puzzle game where players guide a blue ball and a red ball into collision by sketching lines and shapes. It blends logic, physics, and creative drawing mechanics with increasingly tricky, riddle-like stages that reward flexible thinking.
 
-View your app in AI Studio: https://ai.studio/apps/drive/1pV8W72Ixtqmvo_gr9_NfxXKBOYXeDquv
+## Core Gameplay
+
+- Draw freely with different pens to create ramps, bridges, and barriers.
+- The simulation makes balls roll, bounce, and react to your shapes in real time.
+- A level is cleared only when the blue and red balls collide, encouraging trial-and-error experimentation.
+
+## Features
+
+- Real-time physics powered by Matter.js.
+- Multiple pens with different widths/colors that unlock as you progress.
+- Hints per level, reset controls, and optional sound effects with mute.
+- Level selector with progress saved in localStorage.
+
+## Tech Stack
+
+- React 19 + TypeScript
+- Vite
+- Matter.js (loaded via CDN in `index.html`)
+- Tailwind CSS (CDN)
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:** Node.js
 
+1. Install dependencies: `npm install`
+2. Start the dev server: `npm run dev`
+3. Open the local URL printed by Vite in your browser.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Build and Preview
+
+- Production build: `npm run build`
+- Preview the build: `npm run preview`
+- Serve the `dist` folder: `npm run start` (uses `PORT` if set)
+
+## Project Structure
+
+- `App.tsx` handles auth stub, level progression, and routing between views.
+- `components/GameView.tsx` implements drawing, physics, and win logic.
+- `components/AuthView.tsx` provides a mock sign-in screen (no real auth).
+- `components/LevelSelector.tsx` renders the level grid and unlock state.
+- `constants.ts` defines levels, pens, and game dimensions.
+
+## Notes
+
+- Progress and mute state are persisted in localStorage (`match_the_dots_save`, `match_the_dots_muted`).
