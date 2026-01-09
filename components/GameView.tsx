@@ -18,45 +18,42 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   const runnerRef = useRef<any>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   
+  const [isMuted, setIsMuted] = useState(() => {
+    return localStorage.getItem('match_the_dots_muted') === 'true';
+  });
+  const isMutedRef = useRef(isMuted);
+
   const [currentPen, setCurrentPen] = useState<Pen>(PENS[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [won, setWon] = useState(false);
   const [drawPoints, setDrawPoints] = useState<{ x: number, y: number }[]>([]);
   const [drawnShapesCount, setDrawnShapesCount] = useState(0);
-  const [isMuted, setIsMuted] = useState(() => {
-    return localStorage.getItem('match_the_dots_muted') === 'true';
-  });
 
   const level = LEVELS.find(l => l.id === levelId)!;
 
-  // Persistence for mute state
   useEffect(() => {
+    isMutedRef.current = isMuted;
     localStorage.setItem('match_the_dots_muted', isMuted.toString());
   }, [isMuted]);
 
-  // Sound Synthesis Helpers
   const playSound = (type: 'draw' | 'pop' | 'win' | 'click') => {
-    if (isMuted) return;
-
+    if (isMutedRef.current) return;
     if (!audioCtxRef.current) {
       audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
     const ctx = audioCtxRef.current;
     if (ctx.state === 'suspended') ctx.resume();
-
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-
     osc.connect(gain);
     gain.connect(ctx.destination);
-
     const now = ctx.currentTime;
 
     switch (type) {
       case 'draw':
         osc.type = 'sine';
         osc.frequency.setValueAtTime(200 + Math.random() * 100, now);
-        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.setValueAtTime(0.02, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
         osc.start();
         osc.stop(now + 0.1);
@@ -65,19 +62,18 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(400, now);
         osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.setValueAtTime(0.1, now);
         gain.gain.linearRampToValueAtTime(0, now + 0.1);
         osc.start();
         osc.stop(now + 0.1);
         break;
       case 'win':
-        osc.type = 'square';
         [440, 554.37, 659.25, 880].forEach((freq, i) => {
           const o = ctx.createOscillator();
           const g = ctx.createGain();
           o.type = 'sine';
           o.frequency.setValueAtTime(freq, now + i * 0.1);
-          g.gain.setValueAtTime(0.1, now + i * 0.1);
+          g.gain.setValueAtTime(0.05, now + i * 0.1);
           g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.4);
           o.connect(g);
           g.connect(ctx.destination);
@@ -88,7 +84,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
       case 'click':
         osc.type = 'sine';
         osc.frequency.setValueAtTime(800, now);
-        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.setValueAtTime(0.05, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
         osc.start();
         osc.stop(now + 0.05);
@@ -106,7 +102,9 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     }
     
     const engine = M.Engine.create({
-      gravity: { x: 0, y: 0.5 }
+      enableSleeping: false,
+      positionIterations: 10,
+      velocityIterations: 10
     });
     engineRef.current = engine;
 
@@ -132,10 +130,11 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     });
 
     const balls = level.balls.map(ball => {
-      return M.Bodies.circle(ball.x, ball.y, 20, {
+      return M.Bodies.circle(ball.x, ball.y, 18, {
         isStatic: true,
-        restitution: 0.8,
-        friction: 0.05,
+        restitution: 0.6,
+        friction: 0.1,
+        frictionAir: 0.01,
         label: 'ball',
         render: { fillStyle: ball.color }
       });
@@ -145,16 +144,16 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
 
     if (M.Events) {
       M.Events.on(engine, 'collisionStart', (event: any) => {
-        const pairs = event.pairs;
-        for (let i = 0; i < pairs.length; i++) {
-          const pair = pairs[i];
-          if (pair.bodyA.label === 'ball' && pair.bodyB.label === 'ball' && !won) {
-            setWon(true);
-            playSound('win');
+        event.pairs.forEach((pair: any) => {
+          if (pair.bodyA.label === 'ball' && pair.bodyB.label === 'ball') {
+            setWon(prev => {
+              if (!prev) playSound('win');
+              return true;
+            });
           } else if (pair.bodyA.label === 'ball' || pair.bodyB.label === 'ball') {
             playSound('pop');
           }
-        }
+        });
       });
     }
 
@@ -163,7 +162,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     M.Runner.run(runner, engine);
     M.Render.run(render);
 
-  }, [level, won, isMuted]); // Added isMuted to dependency to ensure correct context
+  }, [level]);
 
   useEffect(() => {
     const timer = setTimeout(initPhysics, 150);
@@ -184,8 +183,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     const nextState = !isPlaying;
     setIsPlaying(nextState);
 
-    const world = engineRef.current.world;
-    const bodies = M.Composite.allBodies(world);
+    const bodies = M.Composite.allBodies(engineRef.current.world);
     bodies.forEach((b: any) => {
       if (b.label === 'ball' || b.label === 'drawnShape') {
         M.Body.setStatic(b, !nextState);
@@ -202,39 +200,20 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   };
 
   const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (isMuted) {
-      // Play a quick click if we just unmuted
-      const tempMute = false;
-      if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      const ctx = audioCtxRef.current;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.05);
-    }
+    setIsMuted(prev => !prev);
+    if (!isMuted) playSound('click');
   };
 
   const getPos = (e: any) => {
     if (!canvasRef.current) return { x: 0, y: 0 };
     const rect = canvasRef.current.getBoundingClientRect();
-    
-    let clientX = 0;
-    let clientY = 0;
+    const actualEvent = e.nativeEvent || e;
+    let clientX = 0, clientY = 0;
 
-    const actualEvent = (e.nativeEvent || e);
-    
     if (actualEvent.touches && actualEvent.touches.length > 0) {
       clientX = actualEvent.touches[0].clientX;
       clientY = actualEvent.touches[0].clientY;
-    } else if (actualEvent.clientX !== undefined) {
+    } else {
       clientX = actualEvent.clientX;
       clientY = actualEvent.clientY;
     }
@@ -251,24 +230,24 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
     if (isPlaying || won) return;
     const pos = getPos(e);
-    if (isNaN(pos.x) || isNaN(pos.y)) return;
     setDrawPoints([pos]);
   };
 
   const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (isPlaying || won || drawPoints.length === 0) return;
     const pos = getPos(e);
-    if (isNaN(pos.x) || isNaN(pos.y)) return;
-    setDrawPoints(prev => [...prev, pos]);
-    playSound('draw');
+    const lastPos = drawPoints[drawPoints.length - 1];
+    const dist = Math.sqrt(Math.pow(pos.x - lastPos.x, 2) + Math.pow(pos.y - lastPos.y, 2));
+    if (dist > 5) {
+      setDrawPoints(prev => [...prev, pos]);
+      playSound('draw');
+    }
   };
 
   const handleMouseUp = () => {
-    if (drawPoints.length < 2) {
-      setDrawPoints([]);
-      return;
+    if (drawPoints.length > 1) {
+      createPhysicalLine(drawPoints);
     }
-    createPhysicalLine(drawPoints);
     setDrawPoints([]);
   };
 
@@ -276,36 +255,39 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     const M = (window as any).Matter;
     if (!engineRef.current || !M) return;
 
-    const bodies = [];
+    const segments = [];
+    const thickness = Math.max(currentPen.width, 6); // Ensure a minimum physical thickness
+
     for (let i = 0; i < points.length - 1; i++) {
       const p1 = points[i];
       const p2 = points[i+1];
       const dx = p2.x - p1.x;
       const dy = p2.y - p1.y;
-      const length = Math.max(Math.sqrt(dx*dx + dy*dy), 1);
+      const length = Math.sqrt(dx*dx + dy*dy);
       const angle = Math.atan2(dy, dx);
       
       const segment = M.Bodies.rectangle(
         p1.x + dx / 2,
         p1.y + dy / 2,
-        length,
-        currentPen.width,
+        length + 2, // Slight overlap to prevent gaps
+        thickness,
         {
           angle: angle,
           friction: 0.5,
+          restitution: 0.1,
           render: { fillStyle: currentPen.color }
         }
       );
-      bodies.push(segment);
+      segments.push(segment);
     }
 
-    if (bodies.length === 0) return;
+    if (segments.length === 0) return;
 
     const compound = M.Body.create({
-      parts: bodies,
+      parts: segments,
       isStatic: !isPlaying,
-      friction: 0.5,
-      label: 'drawnShape'
+      label: 'drawnShape',
+      friction: 0.5
     });
 
     M.Composite.add(engineRef.current.world, compound);
@@ -315,7 +297,6 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   useEffect(() => {
     const M = (window as any).Matter;
     if (!M || !M.Events || !renderRef.current) return;
-
     const currentRender = renderRef.current;
 
     const onAfterRender = () => {
@@ -334,23 +315,11 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
         }
         ctx.stroke();
       }
-
-      if (won) {
-         ctx.font = 'bold 40px Quicksand, sans-serif';
-         ctx.fillStyle = 'rgba(0,0,0,0.6)';
-         ctx.textAlign = 'center';
-         ctx.fillText("SUCCESS!", GAME_WIDTH/2, GAME_HEIGHT/2);
-      }
     };
 
     M.Events.on(currentRender, 'afterRender', onAfterRender);
-    
-    return () => {
-      if (M.Events && currentRender) {
-        M.Events.off(currentRender, 'afterRender', onAfterRender);
-      }
-    };
-  }, [drawPoints, currentPen, won]);
+    return () => M.Events.off(currentRender, 'afterRender', onAfterRender);
+  }, [drawPoints, currentPen]);
 
   return (
     <div className="flex flex-col h-screen bg-[#f5f5f5]" ref={containerRef}>
@@ -418,7 +387,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
           onTouchStart={handleMouseDown}
           onTouchMove={handleMouseMove}
           onTouchEnd={handleMouseUp}
-          className="bg-white/50 shadow-2xl rounded-sm border-8 border-gray-100 max-w-full max-h-full object-contain"
+          className="bg-white shadow-2xl rounded-sm border-8 border-gray-100 max-w-full max-h-full object-contain"
         />
 
         {level.hint && !isPlaying && !won && (
