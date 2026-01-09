@@ -46,11 +46,11 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
           </div>
         </header>
 
-        <section className="rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 md:p-8 shadow-2xl">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+        <section className="rounded-3xl border border-slate-700/60 bg-slate-900/70 p-4 md:p-6 shadow-2xl">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <div>
-              <h2 className="text-2xl font-semibold">Select Level</h2>
-              <p className="text-sm text-slate-400">{totalLevels} handcrafted stages await.</p>
+              <h2 className="text-xl font-semibold">Select Level</h2>
+              <p className="text-xs text-slate-400">{totalLevels} handcrafted stages await.</p>
             </div>
             <div className="flex items-center gap-2 text-xs text-slate-400">
               <span className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-800/70 px-3 py-1">
@@ -59,29 +59,29 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
             </div>
           </div>
 
-          <div className="max-h-[60vh] overflow-y-auto pr-2">
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-            {LEVELS.map((lvl) => {
-              const isUnlocked = lvl.id <= unlockedLevels;
-              return (
-                <button
-                  key={lvl.id}
-                  disabled={!isUnlocked}
-                  onClick={() => onSelect(lvl.id)}
-                  className={`aspect-square rounded-2xl flex items-center justify-center text-lg font-semibold transition-all ${
-                    isUnlocked
-                      ? 'bg-slate-800/80 text-white border border-blue-500/40 shadow-lg hover:shadow-blue-500/20 hover:-translate-y-1 hover:border-blue-400/70'
+          <div className="max-h-[52vh] overflow-y-auto pr-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+              {LEVELS.map((lvl) => {
+                const isUnlocked = lvl.id <= unlockedLevels;
+                return (
+                  <button
+                    key={lvl.id}
+                    disabled={!isUnlocked}
+                    onClick={() => onSelect(lvl.id)}
+                    className={`aspect-square rounded-xl flex items-center justify-center text-base font-semibold transition-all ${
+                      isUnlocked
+                      ? 'bg-slate-800/80 text-white border border-blue-500/40 shadow hover:shadow-blue-500/20 hover:-translate-y-0.5 hover:border-blue-400/70'
                       : 'bg-slate-800/40 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-60'
-                  }`}
-                >
-                  {isUnlocked ? (
-                    lvl.id
-                  ) : (
-                    <span className="flex flex-col items-center gap-1 text-sm">
-                      <span className="text-base font-semibold text-slate-400">{lvl.id}</span>
-                      <span aria-hidden="true">🔒</span>
-                    </span>
-                  )}
+                    }`}
+                  >
+                    {isUnlocked ? (
+                      lvl.id
+                    ) : (
+                      <span className="flex flex-col items-center gap-1 text-[11px]">
+                        <span className="text-sm font-semibold text-slate-400">{lvl.id}</span>
+                        <span aria-hidden="true">🔒</span>
+                      </span>
+                    )}
                 </button>
               );
             })}
