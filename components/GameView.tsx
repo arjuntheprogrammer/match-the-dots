@@ -205,7 +205,8 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
 
   const getPos = (e: any) => {
     if (!canvasRef.current) return { x: 0, y: 0 };
-    const rect = canvasRef.current.getBoundingClientRect();
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
     const actualEvent = e.nativeEvent || e;
     let clientX = 0, clientY = 0;
 
@@ -217,12 +218,14 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
       clientY = actualEvent.clientY;
     }
     
-    const scaleX = GAME_WIDTH / rect.width;
-    const scaleY = GAME_HEIGHT / rect.height;
+    const scaleX = canvas.width / canvas.clientWidth;
+    const scaleY = canvas.height / canvas.clientHeight;
+    const offsetX = rect.left + canvas.clientLeft;
+    const offsetY = rect.top + canvas.clientTop;
 
     return {
-      x: (clientX - rect.left) * scaleX,
-      y: (clientY - rect.top) * scaleY
+      x: (clientX - offsetX) * scaleX,
+      y: (clientY - offsetY) * scaleY
     };
   };
 
