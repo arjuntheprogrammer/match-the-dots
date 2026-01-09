@@ -73,7 +73,14 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
                       : 'bg-slate-800/40 text-slate-500 border border-slate-700/50 cursor-not-allowed opacity-60'
                   }`}
                 >
-                  {isUnlocked ? lvl.id : '🔒'}
+                  {isUnlocked ? (
+                    lvl.id
+                  ) : (
+                    <span className="flex flex-col items-center gap-1 text-sm">
+                      <span className="text-base font-semibold text-slate-400">{lvl.id}</span>
+                      <span aria-hidden="true">🔒</span>
+                    </span>
+                  )}
                 </button>
               );
             })}
