@@ -59,7 +59,8 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
             </div>
           </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+          <div className="max-h-[60vh] overflow-y-auto pr-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
             {LEVELS.map((lvl) => {
               const isUnlocked = lvl.id <= unlockedLevels;
               return (
@@ -84,6 +85,7 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({ unlockedLevels, on
                 </button>
               );
             })}
+            </div>
           </div>
         </section>
       </div>
