@@ -42,9 +42,8 @@ Match the Dots is a physics-based drawing puzzle game where players guide a blue
 
 ## Project Structure
 
-- `App.tsx` handles auth stub, level progression, and routing between views.
+- `App.tsx` handles level progression and routing between views.
 - `components/GameView.tsx` implements drawing, physics, and win logic.
-- `components/AuthView.tsx` provides a mock sign-in screen (no real auth).
 - `components/LevelSelector.tsx` renders the level grid and unlock state.
 - `constants.ts` defines levels, pens, and game dimensions.
 
