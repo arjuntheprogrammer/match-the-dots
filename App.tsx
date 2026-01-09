@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { GameView } from './components/GameView';
 import { LevelSelector } from './components/LevelSelector';
+import { LEVELS } from './constants';
 
 const App: React.FC = () => {
   const [currentLevel, setCurrentLevel] = useState<number | null>(null);
@@ -28,6 +29,11 @@ const App: React.FC = () => {
     const nextLevel = Math.max(unlockedLevels, levelId + 1);
     setUnlockedLevels(nextLevel);
     saveProgress(nextLevel, unlockedPens);
+    if (levelId < LEVELS.length) {
+      setCurrentLevel(levelId + 1);
+    } else {
+      setCurrentLevel(null);
+    }
   };
 
   if (currentLevel === null) {
