@@ -36,11 +36,12 @@ const DEFAULT_PROGRESS = {
 
 const cookieName = process.env.SESSION_COOKIE_NAME || '__session';
 const cookieDomain = process.env.SESSION_COOKIE_DOMAIN;
+const cookieSecure = process.env.SESSION_COOKIE_SECURE !== 'false';
 const redirectUrl = process.env.AUTH_REDIRECT_URL || 'https://arjuntheprogrammer.com/';
 
 const baseCookieOptions = {
   httpOnly: true,
-  secure: true,
+  secure: cookieSecure,
   sameSite: 'lax',
   path: '/'
 };

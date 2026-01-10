@@ -35,7 +35,7 @@ Match the Dots is a physics-based drawing puzzle game where players guide a blue
 - Session cookie issued from [arjuntheprogrammer.com](https://arjuntheprogrammer.com/) (or `http://localhost:3000/` when running locally; the Express server redirects there if the cookie is missing).
 
 1. Install dependencies: `npm install`
-2. Copy `.env.template` to `.env` for shared/prod defaults, and create `.env.local` (already checked in) for localhost overrides. Values in `.env.local` take priority, so it points `AUTH_REDIRECT_URL` to `http://localhost:3000/` and scopes the cookie to `localhost` while keeping all other Firebase config the same. If your Firestore database uses a custom ID (e.g., `match-the-dots`), set `FIRESTORE_DATABASE_ID` to that value.
+2. Copy `.env.template` to `.env` for shared/prod cookie defaults, and create `.env.local` (already checked in) for localhost overrides. Values in `.env.local` take priority, so it points `AUTH_REDIRECT_URL` to `http://localhost:3000/` and sets `SESSION_COOKIE_SECURE=false` for HTTP. Keep `SESSION_COOKIE_DOMAIN` empty locally so both apps issue and clear the same host-only cookie. If your Firestore database uses a custom ID (e.g., `match-the-dots`), set `FIRESTORE_DATABASE_ID` to that value.
 3. Update `GOOGLE_APPLICATION_CREDENTIALS` inside `.env.local` if your key lives elsewhere. The provided path points to `secrets/…json` under this repo for convenience.
 4. Start the API/server (required so `/api/*` endpoints work during dev): `npm run start` (keep it running in its own terminal; by default `.env.local` sets `PORT=8081` to avoid clashing with the auth app on 8080).
 5. In another terminal start the Vite dev server (defaults to port 3002 so it never collides with the auth app on 3000): `npm run dev`
