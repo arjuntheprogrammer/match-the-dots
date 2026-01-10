@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameView } from './components/GameView';
 import { LevelSelector } from './components/LevelSelector';
+import { TopNav } from './components/TopNav';
 import { LEVELS } from './constants';
 import { fetchCurrentUser, fetchProgress, saveProgress, signOut, type AuthUser } from './services/apiClient';
 
@@ -19,6 +20,15 @@ const App: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.body.style.overflowX = 'hidden';
+    document.body.style.overflowY = currentLevel === null ? 'auto' : 'hidden';
+    return () => {
+      document.body.style.overflowX = '';
+      document.body.style.overflowY = '';
+    };
+  }, [currentLevel]);
 
   const persistLocalProgress = useCallback((levels: number, pens: string[]) => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
@@ -194,46 +204,45 @@ const App: React.FC = () => {
 
   if (currentLevel === null) {
     return (
-      <LevelSelector 
-        unlockedLevels={unlockedLevels} 
-        onSelect={(id) => setCurrentLevel(id)}
-        user={user}
-        onSignOut={handleSignOut}
-        isSyncing={isSyncing}
-        syncError={syncError}
-        authError={authError}
-      />
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
+        <TopNav
+          unlockedLevels={unlockedLevels}
+          totalLevels={LEVELS.length}
+          user={user}
+          isSyncing={isSyncing}
+          syncError={syncError}
+          onSignOut={handleSignOut}
+        />
+        <LevelSelector 
+          unlockedLevels={unlockedLevels} 
+          onSelect={(id) => setCurrentLevel(id)}
+          user={user}
+          onSignOut={handleSignOut}
+          isSyncing={isSyncing}
+          syncError={syncError}
+          authError={authError}
+        />
+      </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div className="min-h-screen bg-slate-950 text-white">
+      <TopNav
+        unlockedLevels={unlockedLevels}
+        totalLevels={LEVELS.length}
+        user={user}
+        isSyncing={isSyncing}
+        syncError={syncError}
+        onSignOut={handleSignOut}
+      />
       <GameView 
         levelId={currentLevel} 
         unlockedPens={unlockedPens}
         onBack={() => setCurrentLevel(null)} 
         onComplete={handleLevelComplete}
       />
-      <div className="absolute top-4 right-4 flex flex-col gap-2 items-end text-xs">
-        <button
-          onClick={handleSignOut}
-          className="rounded-full bg-slate-900/80 border border-slate-600 px-4 py-1 text-white hover:bg-slate-800"
-        >
-          Sign out
-        </button>
-        <div
-          className={`rounded-full px-4 py-1 text-white transition-colors ${
-            syncError
-              ? 'bg-rose-900/80 border border-rose-500/40'
-              : isSyncing
-                ? 'bg-blue-900/80 border border-blue-500/40'
-                : 'bg-emerald-900/80 border border-emerald-500/40'
-          }`}
-        >
-          {syncError ? syncError : isSyncing ? 'Syncing progress…' : 'Progress synced'}
-        </div>
-        {authError && <div className="text-xs text-rose-200 bg-rose-950/60 px-3 py-1 rounded-full">{authError}</div>}
-      </div>
+      {authError && <div className="fixed bottom-4 right-4 text-xs text-rose-200 bg-rose-950/60 px-3 py-1 rounded-full">{authError}</div>}
     </div>
   );
 };

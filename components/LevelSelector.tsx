@@ -23,18 +23,12 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({
   authError
 }) => {
   const totalLevels = LEVELS.length;
-  const progress = Math.min(unlockedLevels, totalLevels);
-  const progressPercent = Math.round((progress / totalLevels) * 100);
-  const displayName = user.displayName || user.email || 'Player';
-  const syncStatus = syncError ?? (isSyncing ? 'Syncing progress…' : 'Progress synced to Firebase');
-  const syncClass = syncError ? 'text-rose-300' : isSyncing ? 'text-blue-300' : 'text-emerald-300';
 
   return (
-    <div className="h-screen overflow-y-auto bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-10 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-6 text-white overflow-y-auto">
       <div className="max-w-5xl mx-auto">
-        <header className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between mb-10">
+        <header className="flex flex-col gap-6 mb-10">
           <div className="space-y-4">
-            <p className="text-xs uppercase tracking-[0.35em] text-blue-400">Match the Dots</p>
             <div>
               <h1 className="text-4xl md:text-5xl font-bold leading-tight">Draw. Bounce. Connect.</h1>
               <p className="text-slate-300 max-w-xl mt-3">
@@ -47,39 +41,9 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({
               <div className="rounded-xl border border-slate-700/70 bg-slate-900/60 px-3 py-2">🧠 New pens unlock over time.</div>
             </div>
           </div>
-
-          <div className="w-full md:w-72 space-y-4">
-            <div className="rounded-2xl border border-slate-700/70 bg-slate-900/70 p-5 shadow-lg">
-              <div className="flex items-center justify-between text-sm text-slate-300">
-                <span>Progress</span>
-                <span className="font-semibold text-blue-300">{progress}/{totalLevels}</span>
-              </div>
-              <div className="mt-3 h-2 w-full rounded-full bg-slate-700">
-                <div
-                  className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-              <p className="mt-3 text-xs text-slate-400">Keep going to unlock fresh pens and tougher puzzles.</p>
-            </div>
-            <div className="rounded-2xl border border-slate-700/70 bg-slate-900/70 p-5 shadow-lg space-y-3">
-              <div>
-                <p className="text-xs text-slate-400">Signed in as</p>
-                <p className="text-sm font-semibold text-white">{displayName}</p>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <span className={`text-xs ${syncClass}`}>{syncStatus}</span>
-                <button
-                  onClick={onSignOut}
-                  className="inline-flex justify-center rounded-full border border-slate-600 px-4 py-1 text-sm font-semibold text-white hover:bg-slate-800"
-                >
-                  Sign out
-                </button>
-              </div>
-              {authError && <p className="text-xs text-rose-300">{authError}</p>}
-            </div>
-          </div>
         </header>
+
+        {authError && <p className="mt-3 text-xs text-rose-300">{authError}</p>}
 
         <section className="rounded-3xl border border-slate-700/60 bg-slate-900/70 p-4 md:p-6 shadow-2xl">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
@@ -127,6 +91,11 @@ export const LevelSelector: React.FC<LevelSelectorProps> = ({
               })}
           </div>
         </section>
+
+        <footer className="mt-10 border-t border-slate-800/70 pt-4 pb-6 text-xs text-slate-400 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <span>Match the Dots • Physics puzzles powered by Firebase</span>
+          <span className="text-slate-500">Sync saves across devices</span>
+        </footer>
       </div>
     </div>
   );
