@@ -17,6 +17,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   const renderRef = useRef<any>(null);
   const runnerRef = useRef<any>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const EDGE_GUARD_PX = 24;
   
   const [isMuted, setIsMuted] = useState(() => {
     return localStorage.getItem('match_the_dots_muted') === 'true';
@@ -35,6 +36,28 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     isMutedRef.current = isMuted;
     localStorage.setItem('match_the_dots_muted', isMuted.toString());
   }, [isMuted]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const preventEdgeSwipe = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      const rect = container.getBoundingClientRect();
+      const localX = touch.clientX - rect.left;
+      if (localX <= EDGE_GUARD_PX) {
+        event.preventDefault();
+      }
+    };
+
+    container.addEventListener('touchstart', preventEdgeSwipe, { passive: false });
+    container.addEventListener('touchmove', preventEdgeSwipe, { passive: false });
+    return () => {
+      container.removeEventListener('touchstart', preventEdgeSwipe);
+      container.removeEventListener('touchmove', preventEdgeSwipe);
+    };
+  }, []);
 
   const playSound = (type: 'draw' | 'pop' | 'win' | 'click') => {
     if (isMutedRef.current) return;
@@ -385,7 +408,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
         </div>
       </div>
 
-      <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
+      <div className="flex-1 relative flex items-center justify-center overflow-hidden px-4 sm:px-6 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px]">
         <canvas
           ref={canvasRef}
           onMouseDown={handleMouseDown}
@@ -394,7 +417,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
           onTouchStart={handleMouseDown}
           onTouchMove={handleMouseMove}
           onTouchEnd={handleMouseUp}
-          className="bg-white shadow-2xl rounded-sm border-8 border-gray-100 max-w-full max-h-full object-contain"
+          className="bg-white shadow-2xl rounded-sm border-8 border-gray-100 max-w-full max-h-full object-contain touch-none"
         />
 
         {!isPlaying && !won && (
