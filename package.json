@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server.js",
-    "test:firestore": "node scripts/checkFirestore.mjs"
+    "test:firestore": "node scripts/checkFirestore.mjs",
+    "test:firestore-progress": "node scripts/verifyProgress.mjs"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

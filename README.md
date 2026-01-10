@@ -41,6 +41,7 @@ Match the Dots is a physics-based drawing puzzle game where players guide a blue
 5. In another terminal start the Vite dev server (defaults to port 3002 so it never collides with the auth app on 3000): `npm run dev`
 6. Visit the printed localhost URL (for example `http://localhost:3002/`). The SPA calls `/api/me` → `/api/progress` through Vite’s proxy so your session cookie and Firestore saves stay in sync.
 7. To verify your environment can reach Firestore, run `npm run test:firestore`. It will attempt to read the `match_the_dots` collection using the configured credentials and database ID.
+8. To verify a write + read round-trip, run `npm run test:firestore-progress`. It writes a diagnostic doc to `match_the_dots/diagnostic` (override with `FIRESTORE_TEST_DOC_ID`) and reads it back.
 
 ## Firebase + Cookie Sync Setup
 

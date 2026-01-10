@@ -212,6 +212,7 @@ const App: React.FC = () => {
           isSyncing={isSyncing}
           syncError={syncError}
           onSignOut={handleSignOut}
+          onLogoClick={() => setCurrentLevel(null)}
         />
         <LevelSelector 
           unlockedLevels={unlockedLevels} 
@@ -235,6 +236,7 @@ const App: React.FC = () => {
         isSyncing={isSyncing}
         syncError={syncError}
         onSignOut={handleSignOut}
+        onLogoClick={() => setCurrentLevel(null)}
       />
       <GameView 
         levelId={currentLevel} 

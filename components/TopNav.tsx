@@ -8,6 +8,7 @@ interface TopNavProps {
   isSyncing: boolean;
   syncError: string | null;
   onSignOut: () => void;
+  onLogoClick?: () => void;
 }
 
 export const TopNav: React.FC<TopNavProps> = ({
@@ -16,7 +17,8 @@ export const TopNav: React.FC<TopNavProps> = ({
   user,
   isSyncing,
   syncError,
-  onSignOut
+  onSignOut,
+  onLogoClick
 }) => {
   const progress = Math.min(unlockedLevels, totalLevels);
   const progressPercent = Math.round((progress / totalLevels) * 100);
@@ -52,7 +54,13 @@ export const TopNav: React.FC<TopNavProps> = ({
     <div className="sticky top-0 z-30 bg-slate-950/80 backdrop-blur border-b border-slate-800/70">
       <div className="max-w-6xl mx-auto px-4 py-3">
         <div className="grid grid-cols-[1fr,2fr,1fr] items-center gap-4">
-          <div className="text-xs uppercase tracking-[0.35em] text-blue-400">Match the Dots</div>
+          <button
+            type="button"
+            onClick={onLogoClick}
+            className="text-xs uppercase tracking-[0.35em] text-blue-400 hover:text-blue-200 transition-colors text-left"
+          >
+            Match the Dots
+          </button>
 
           <div className="flex flex-col items-center gap-1">
             <div className="flex items-center gap-2 text-xs text-slate-300">
@@ -68,10 +76,6 @@ export const TopNav: React.FC<TopNavProps> = ({
           </div>
 
           <div className="flex items-center justify-end gap-3">
-            <div className="flex items-center gap-2 text-sm text-slate-200">
-              <span className="hidden sm:inline">Match the Dots</span>
-              <span className="h-2 w-2 rounded-full bg-blue-400" />
-            </div>
             <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
