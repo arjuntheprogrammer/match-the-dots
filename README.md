@@ -32,7 +32,7 @@ Match the Dots is a physics-based drawing puzzle game where players guide a blue
 
 - Node.js
 - Firebase project with Firestore + service account JSON (used by `firebase-admin`).
-- Session cookie issued from [arjuntheprogrammer.com](https://arjuntheprogrammer.com/) (or `http://localhost:3000/` when running locally; the Express server redirects there if the cookie is missing).
+- Session cookie issued from your auth app domain (or `http://localhost:3000/` when running locally; the Express server redirects there if the cookie is missing).
 
 1. Install dependencies: `npm install`
 2. Copy `.env.template` to `.env` for shared/prod cookie defaults, and create `.env.local` (already checked in) for localhost overrides. Values in `.env.local` take priority, so it points `AUTH_REDIRECT_URL` to `http://localhost:3000/` and sets `SESSION_COOKIE_SECURE=false` for HTTP. Keep `SESSION_COOKIE_DOMAIN` empty locally so both apps issue and clear the same host-only cookie. If your Firestore database uses a custom ID (e.g., `match-the-dots`), set `FIRESTORE_DATABASE_ID` to that value.
@@ -48,36 +48,36 @@ Match the Dots is a physics-based drawing puzzle game where players guide a blue
 1. Create (or reuse) the Firebase project named **match-the-dots**.
 2. Enable **Firestore (Native mode)**. If you create a custom database ID (e.g., `match-the-dots`), reuse that value in `FIRESTORE_DATABASE_ID`. The Express API writes level progress to the `match_the_dots` collection using each authenticated UID as the document ID.
 3. Provision a service account JSON for `firebase-admin` and reference it via `GOOGLE_APPLICATION_CREDENTIALS` (or set `FIREBASE_CONFIG` in the hosting environment).
-4. Ensure your auth entrypoint (arjuntheprogrammer.com) issues a Firebase session cookie named per `SESSION_COOKIE_NAME` and scoped to `SESSION_COOKIE_DOMAIN`. Match-the-dots reuses that cookie and will redirect to `AUTH_REDIRECT_URL` if it becomes invalid.
+4. Ensure your auth entrypoint issues a Firebase session cookie named per `SESSION_COOKIE_NAME` and scoped to `SESSION_COOKIE_DOMAIN`. Match-the-dots reuses that cookie and will redirect to `AUTH_REDIRECT_URL` if it becomes invalid.
 5. Grant that service account the IAM roles it needs (minimum `roles/serviceusage.serviceUsageConsumer`, `roles/firebaseauth.admin`, plus Firestore write access). Example:
 
 ```bash
-gcloud projects add-iam-policy-binding arjuntheprogrammer \
-  --member="serviceAccount:firebase-adminsdk-fbsvc@arjuntheprogrammer.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding YOUR_FIREBASE_PROJECT_ID \
+  --member="serviceAccount:YOUR_FIREBASE_ADMIN_SA_EMAIL" \
   --role="roles/serviceusage.serviceUsageConsumer"
 
-gcloud projects add-iam-policy-binding arjuntheprogrammer \
-  --member="serviceAccount:firebase-adminsdk-fbsvc@arjuntheprogrammer.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding YOUR_FIREBASE_PROJECT_ID \
+  --member="serviceAccount:YOUR_FIREBASE_ADMIN_SA_EMAIL" \
   --role="roles/firebaseauth.admin"
 
-gcloud projects add-iam-policy-binding arjuntheprogrammer \
-  --member="serviceAccount:firebase-adminsdk-fbsvc@arjuntheprogrammer.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding YOUR_FIREBASE_PROJECT_ID \
+  --member="serviceAccount:YOUR_FIREBASE_ADMIN_SA_EMAIL" \
   --role="roles/datastore.user"
 ```
 
-6. If Cloud Run runs as a different service account (for example `935573056818-compute@developer.gserviceaccount.com`), grant the same roles on the Firebase project:
+6. If Cloud Run runs as a different service account (for example `YOUR_CLOUD_RUN_SA_EMAIL`), grant the same roles on the Firebase project:
 
 ```bash
-gcloud projects add-iam-policy-binding arjuntheprogrammer \
-  --member="serviceAccount:935573056818-compute@developer.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding YOUR_FIREBASE_PROJECT_ID \
+  --member="serviceAccount:YOUR_CLOUD_RUN_SA_EMAIL" \
   --role="roles/serviceusage.serviceUsageConsumer"
 
-gcloud projects add-iam-policy-binding arjuntheprogrammer \
-  --member="serviceAccount:935573056818-compute@developer.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding YOUR_FIREBASE_PROJECT_ID \
+  --member="serviceAccount:YOUR_CLOUD_RUN_SA_EMAIL" \
   --role="roles/firebaseauth.admin"
 
-gcloud projects add-iam-policy-binding arjuntheprogrammer \
-  --member="serviceAccount:935573056818-compute@developer.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding YOUR_FIREBASE_PROJECT_ID \
+  --member="serviceAccount:YOUR_CLOUD_RUN_SA_EMAIL" \
   --role="roles/datastore.user"
 ```
 
@@ -86,17 +86,17 @@ gcloud projects add-iam-policy-binding arjuntheprogrammer \
 
 ```bash
 gcloud run services update match-the-dots \
-  --project=gen-lang-client-0536355505 \
-  --region=us-west1 \
-  --set-env-vars=FIREBASE_PROJECT_ID=arjuntheprogrammer,FIRESTORE_DATABASE_ID=match-the-dots,SESSION_COOKIE_NAME=__session,SESSION_COOKIE_DOMAIN=.arjuntheprogrammer.com,SESSION_COOKIE_SECURE=true,AUTH_REDIRECT_URL=https://arjuntheprogrammer.com/
+  --project=YOUR_GCP_PROJECT_ID \
+  --region=YOUR_GCP_REGION \
+  --set-env-vars=FIREBASE_PROJECT_ID=YOUR_FIREBASE_PROJECT_ID,FIRESTORE_DATABASE_ID=match-the-dots,SESSION_COOKIE_NAME=__session,SESSION_COOKIE_DOMAIN=.YOUR_DOMAIN,SESSION_COOKIE_SECURE=true,AUTH_REDIRECT_URL=https://YOUR_DOMAIN/
 ```
 
 9. If Cloud Run startup fails due to memory limits, increase the service memory. Example:
 
 ```bash
 gcloud run services update match-the-dots \
-  --project=gen-lang-client-0536355505 \
-  --region=us-west1 \
+  --project=YOUR_GCP_PROJECT_ID \
+  --region=YOUR_GCP_REGION \
   --memory=512Mi
 ```
 
