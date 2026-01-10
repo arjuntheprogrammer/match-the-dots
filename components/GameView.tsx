@@ -310,21 +310,31 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     if (!engineRef.current || !M) return;
 
     const segments = [];
-    const thickness = Math.max(currentPen.width, 6);
+    const caps = [];
+    const physicsThickness = Math.max(currentPen.width + 2, 8);
+    const capRadius = physicsThickness / 2;
+    const closeThreshold = 24;
 
-    for (let i = 0; i < points.length - 1; i++) {
-      const p1 = points[i];
-      const p2 = points[i+1];
+    const firstPoint = points[0];
+    const lastPoint = points[points.length - 1];
+    const shouldCloseLoop = points.length > 2 && Math.hypot(firstPoint.x - lastPoint.x, firstPoint.y - lastPoint.y) < closeThreshold;
+    const physicsPoints = shouldCloseLoop ? [...points, firstPoint] : points;
+    const capPoints = shouldCloseLoop ? physicsPoints.slice(0, -1) : physicsPoints;
+
+    for (let i = 0; i < physicsPoints.length - 1; i++) {
+      const p1 = physicsPoints[i];
+      const p2 = physicsPoints[i+1];
       const dx = p2.x - p1.x;
       const dy = p2.y - p1.y;
       const length = Math.sqrt(dx*dx + dy*dy);
+      if (length < 1) continue;
       const angle = Math.atan2(dy, dx);
       
       const segment = M.Bodies.rectangle(
         p1.x + dx / 2,
         p1.y + dy / 2,
-        length + 2,
-        thickness,
+        length + capRadius * 1.6,
+        physicsThickness,
         {
           angle: angle,
           friction: 0.5,
@@ -335,10 +345,20 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
       segments.push(segment);
     }
 
+    for (const point of capPoints) {
+      caps.push(
+        M.Bodies.circle(point.x, point.y, capRadius, {
+          friction: 0.5,
+          restitution: 0.1,
+          render: { fillStyle: currentPen.color }
+        })
+      );
+    }
+
     if (segments.length === 0) return;
 
     const compound = M.Body.create({
-      parts: segments,
+      parts: [...segments, ...caps],
       isStatic: !isPlaying, // If physics already started, new lines are immediately dynamic
       label: 'drawnShape',
       friction: 0.5
