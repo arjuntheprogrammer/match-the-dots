@@ -65,8 +65,24 @@ gcloud projects add-iam-policy-binding arjuntheprogrammer \
   --role="roles/datastore.user"
 ```
 
-6. Deploy the built `dist/` folder behind the provided Express server so every request flows through the cookie guard + API endpoints.
-7. To set or update Cloud Run environment variables for the deployed service:
+6. If Cloud Run runs as a different service account (for example `935573056818-compute@developer.gserviceaccount.com`), grant the same roles on the Firebase project:
+
+```bash
+gcloud projects add-iam-policy-binding arjuntheprogrammer \
+  --member="serviceAccount:935573056818-compute@developer.gserviceaccount.com" \
+  --role="roles/serviceusage.serviceUsageConsumer"
+
+gcloud projects add-iam-policy-binding arjuntheprogrammer \
+  --member="serviceAccount:935573056818-compute@developer.gserviceaccount.com" \
+  --role="roles/firebaseauth.admin"
+
+gcloud projects add-iam-policy-binding arjuntheprogrammer \
+  --member="serviceAccount:935573056818-compute@developer.gserviceaccount.com" \
+  --role="roles/datastore.user"
+```
+
+7. Deploy the built `dist/` folder behind the provided Express server so every request flows through the cookie guard + API endpoints.
+8. To set or update Cloud Run environment variables for the deployed service:
 
 ```bash
 gcloud run services update match-the-dots \
@@ -75,8 +91,7 @@ gcloud run services update match-the-dots \
   --set-env-vars=FIREBASE_PROJECT_ID=arjuntheprogrammer,FIRESTORE_DATABASE_ID=match-the-dots,SESSION_COOKIE_NAME=__session,SESSION_COOKIE_DOMAIN=.arjuntheprogrammer.com,SESSION_COOKIE_SECURE=true,AUTH_REDIRECT_URL=https://arjuntheprogrammer.com/
 ```
 
-8. If Cloud Run startup fails due to memory limits, increase the service memory. Example:
-7. If Cloud Run startup fails due to memory limits, increase the service memory. Example:
+9. If Cloud Run startup fails due to memory limits, increase the service memory. Example:
 
 ```bash
 gcloud run services update match-the-dots \
