@@ -7,7 +7,7 @@ interface GameViewProps {
   levelId: number;
   unlockedPens: string[];
   onBack: () => void;
-  onComplete: () => void;
+  onComplete: (levelId: number) => void;
 }
 
 export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBack, onComplete }) => {
@@ -18,6 +18,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   const runnerRef = useRef<any>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const EDGE_GUARD_PX = 24;
+  const completionHandledRef = useRef(false);
   
   const [isMuted, setIsMuted] = useState(() => {
     return localStorage.getItem('match_the_dots_muted') === 'true';
@@ -36,6 +37,21 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     isMutedRef.current = isMuted;
     localStorage.setItem('match_the_dots_muted', isMuted.toString());
   }, [isMuted]);
+
+  useEffect(() => {
+    completionHandledRef.current = false;
+    setIsPlaying(false);
+    setWon(false);
+    setDrawPoints([]);
+    setDrawnShapesCount(0);
+  }, [levelId]);
+
+  const completeLevel = useCallback(() => {
+    if (completionHandledRef.current) return;
+    completionHandledRef.current = true;
+    onComplete(levelId);
+  }, [onComplete, levelId]);
+
 
   useEffect(() => {
     const container = containerRef.current;
@@ -440,7 +456,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
               <p className="text-gray-500 mb-6 text-sm md:text-base">Excellent drawing skills!</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button onClick={reset} className="px-5 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200">Retry</button>
-                <button onClick={() => { playSound('click'); onComplete(); onBack(); }} className="px-6 py-2.5 bg-blue-500 text-white font-bold rounded-xl shadow-lg hover:bg-blue-600">Next Level</button>
+                <button onClick={() => { playSound('click'); completeLevel(); }} className="px-6 py-2.5 bg-blue-500 text-white font-bold rounded-xl shadow-lg hover:bg-blue-600">Next Level</button>
               </div>
             </div>
           </div>

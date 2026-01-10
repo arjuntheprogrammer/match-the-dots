@@ -26,11 +26,12 @@ const App: React.FC = () => {
   };
 
   const handleLevelComplete = (levelId: number) => {
-    const nextLevel = Math.max(unlockedLevels, levelId + 1);
-    setUnlockedLevels(nextLevel);
-    saveProgress(nextLevel, unlockedPens);
+    const nextLevel = levelId + 1;
+    const updatedUnlocked = Math.max(unlockedLevels, nextLevel);
+    setUnlockedLevels(updatedUnlocked);
+    saveProgress(updatedUnlocked, unlockedPens);
     if (levelId < LEVELS.length) {
-      setCurrentLevel(levelId + 1);
+      setCurrentLevel(nextLevel);
     } else {
       setCurrentLevel(null);
     }
@@ -50,7 +51,7 @@ const App: React.FC = () => {
       levelId={currentLevel} 
       unlockedPens={unlockedPens}
       onBack={() => setCurrentLevel(null)} 
-      onComplete={() => handleLevelComplete(currentLevel)}
+      onComplete={handleLevelComplete}
     />
   );
 };
