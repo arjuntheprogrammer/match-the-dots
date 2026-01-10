@@ -66,6 +66,24 @@ gcloud projects add-iam-policy-binding arjuntheprogrammer \
 ```
 
 6. Deploy the built `dist/` folder behind the provided Express server so every request flows through the cookie guard + API endpoints.
+7. To set or update Cloud Run environment variables for the deployed service:
+
+```bash
+gcloud run services update match-the-dots \
+  --project=gen-lang-client-0536355505 \
+  --region=us-west1 \
+  --set-env-vars=FIREBASE_PROJECT_ID=arjuntheprogrammer,FIRESTORE_DATABASE_ID=match-the-dots,SESSION_COOKIE_NAME=__session,SESSION_COOKIE_DOMAIN=.arjuntheprogrammer.com,SESSION_COOKIE_SECURE=true,AUTH_REDIRECT_URL=https://arjuntheprogrammer.com/
+```
+
+8. If Cloud Run startup fails due to memory limits, increase the service memory. Example:
+7. If Cloud Run startup fails due to memory limits, increase the service memory. Example:
+
+```bash
+gcloud run services update match-the-dots \
+  --project=gen-lang-client-0536355505 \
+  --region=us-west1 \
+  --memory=512Mi
+```
 
 ## Build and Preview
 
