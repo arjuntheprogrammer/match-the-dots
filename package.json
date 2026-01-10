@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test:firestore": "node scripts/checkFirestore.mjs"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "firebase-admin": "^12.5.0",
     "react": "^19.2.3",
