@@ -17,6 +17,7 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   const renderRef = useRef<any>(null);
   const runnerRef = useRef<any>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
   const EDGE_GUARD_PX = 24;
   const completionHandledRef = useRef(false);
   
@@ -24,6 +25,12 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     return localStorage.getItem('match_the_dots_muted') === 'true';
   });
   const isMutedRef = useRef(isMuted);
+  const [volume, setVolume] = useState(() => {
+    const stored = localStorage.getItem('match_the_dots_volume');
+    const parsed = stored ? Number(stored) : 50;
+    return Number.isFinite(parsed) ? Math.min(100, Math.max(0, parsed)) : 50;
+  });
+  const volumeRef = useRef(volume);
 
   const [currentPen, setCurrentPen] = useState<Pen>(PENS[0]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -36,7 +43,18 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
   useEffect(() => {
     isMutedRef.current = isMuted;
     localStorage.setItem('match_the_dots_muted', isMuted.toString());
+    if (masterGainRef.current) {
+      masterGainRef.current.gain.value = isMuted ? 0 : volumeRef.current / 100;
+    }
   }, [isMuted]);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+    localStorage.setItem('match_the_dots_volume', volume.toString());
+    if (masterGainRef.current) {
+      masterGainRef.current.gain.value = isMutedRef.current ? 0 : volume / 100;
+    }
+  }, [volume]);
 
   useEffect(() => {
     completionHandledRef.current = false;
@@ -82,10 +100,15 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
     }
     const ctx = audioCtxRef.current;
     if (ctx.state === 'suspended') ctx.resume();
+    if (!masterGainRef.current) {
+      masterGainRef.current = ctx.createGain();
+      masterGainRef.current.gain.value = volumeRef.current / 100;
+      masterGainRef.current.connect(ctx.destination);
+    }
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(masterGainRef.current);
     const now = ctx.currentTime;
 
     switch (type) {
@@ -239,7 +262,15 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
 
   const toggleMute = () => {
     setIsMuted(prev => !prev);
-    if (!isMuted) playSound('click');
+  };
+
+  const handleVolumeChange = (nextValue: number) => {
+    if (nextValue === 0) {
+      setIsMuted(true);
+    } else if (isMutedRef.current) {
+      setIsMuted(false);
+    }
+    setVolume(nextValue);
   };
 
   const getPos = (e: any) => {
@@ -425,22 +456,45 @@ export const GameView: React.FC<GameViewProps> = ({ levelId, unlockedPens, onBac
 
         <div className="flex items-center gap-2 justify-between md:justify-end">
           <button 
-            onClick={toggleMute}
-            className={`p-2.5 md:p-3 rounded-full transition-all active:scale-90 ${isMuted ? 'bg-red-100 text-red-500' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-          >
-            {isMuted ? (
-              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
-            ) : (
-              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-            )}
-          </button>
-          <button 
             onClick={reset}
             className="p-2.5 md:p-3 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-all active:scale-90 flex items-center gap-2 px-4 md:px-5"
           >
             <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
             <span className="font-bold text-xs md:text-sm">Reset</span>
           </button>
+          <div
+            className={`flex items-center gap-3 bg-gray-200 text-gray-700 rounded-full px-3 py-2 transition-all hover:bg-gray-300 active:scale-90 cursor-pointer ${
+              isMuted ? 'opacity-70' : ''
+            }`}
+            onClick={toggleMute}
+            title={isMuted ? 'Unmute' : 'Mute'}
+            role="button"
+            aria-pressed={isMuted}
+          >
+            {isMuted ? (
+              <svg className="w-4 h-4 md:w-5 md:h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.5 7.5 9H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2.5l3.5 3.5a1 1 0 0 0 1.7-.7V6.2a1 1 0 0 0-1.7-.7Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m16 9 5 6m0-6-5 6" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 md:w-5 md:h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.5 7.5 9H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2.5l3.5 3.5a1 1 0 0 0 1.7-.7V6.2a1 1 0 0 0-1.7-.7Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 9.5a3.5 3.5 0 0 1 0 5m2-7.5a6 6 0 0 1 0 10" />
+              </svg>
+            )}
+            <span className="text-xs font-bold text-gray-700">Sound</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={volume}
+              onChange={(e) => handleVolumeChange(Number(e.target.value))}
+              onClick={(e) => e.stopPropagation()}
+              className="w-24 md:w-28 accent-blue-500"
+              aria-label="Sound volume"
+            />
+            <span className="text-xs font-bold text-gray-700 w-8 text-right">{volume}%</span>
+          </div>
         </div>
       </div>
 
